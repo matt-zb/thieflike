@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://main/main.gd" id="1"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Geometry" type="Node3D" parent="World"]
+
+[node name="Lights" type="Node3D" parent="World"]
+
+[node name="NPCs" type="Node3D" parent="World"]
+
+[node name="Interactables" type="Node3D" parent="World"]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="World"]
+
+[node name="Systems" type="Node" parent="World"]
+
+[node name="Player" type="Node3D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]

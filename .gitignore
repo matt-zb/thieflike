@@ -1,0 +1,11 @@
+# Godot 4 caches. .import/ artifacts are regenerated locally and shouldn't
+# be committed, but *.import files and *.uid sidecar files ARE committed
+# (see CLAUDE.md / M0 spec) so do not ignore those.
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# OS / editor cruft
+.DS_Store
+*.tmp
