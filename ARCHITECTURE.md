@@ -31,6 +31,31 @@ changes first, then the code.
 **Recommended additional addons:** none. Everything below is built in-house
 on engine features.
 
+### 1.1 Art pipeline: photo textures and photogrammetry
+
+All visible surfaces are **real geometry with PBR materials** lit in real
+time. This is required because light is the core mechanic.
+
+- **Level surfaces** (walls, floors, doors, trim) are TrenchBroom brushes
+  textured with **photo-sourced, tileable PBR materials**: albedo, normal
+  and roughness maps made from photographs of real surfaces. func_godot maps
+  each TrenchBroom texture name to a Godot `StandardMaterial3D` or
+  `ORMMaterial3D`, and the texture name also carries the footstep surface
+  convention (§8).
+- **Props** (furniture, appliances, clutter) are **photogrammetry scans**,
+  decimated and retopologised as needed, imported as glTF, and placed in
+  maps as `prop_*` point entities or as static model entities.
+- **Capture rule.** Capture in flat, overcast light, or remove shadows
+  afterwards, so the albedo has no baked-in lighting. Baked shadows would
+  contradict the real-time lights and the power mechanic.
+- **Not used: Gaussian splatting.** Splats bake in the lighting from capture
+  time and don't respond to Godot lights, SDFGI or power changes. A splat or
+  mesh scan of the real building may be used **only as a layout reference**
+  when building maps (for example, a decimated OBJ shown on a point entity
+  in TrenchBroom to trace over). It never ships in the game.
+- Real placeholder art arrives with the developer's maps. Until then, gyms
+  and the greybox use flat prototype materials.
+
 ---
 
 ## 2. Project layout

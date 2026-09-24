@@ -565,3 +565,5 @@ Not in the vertical slice:
 - Vehicles beyond the static car used for extraction.
 - The final Mission 1 map. The developer builds it in TrenchBroom. The slice
   ships with a greybox townhouse built through the same pipeline.
+- Gaussian splatting as a rendering technique. Art uses photo-sourced PBR
+  textures and photogrammetry props lit in real time (ARCHITECTURE §1.1).
