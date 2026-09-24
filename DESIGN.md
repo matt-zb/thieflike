@@ -56,7 +56,8 @@ All values are starting points and live in exported variables.
   feet with enough clearance on top. The player climbs over the ledge in about
   0.6–0.9 s, taking longer for higher ledges. Input is locked during the
   mantle and the climb makes a soft noise. Used for window sills, fences, the
-  alley wall and furniture.
+  alley wall and furniture. If there's only crouch-height clearance on top
+  (a window opening, for example), the mantle ends in a crouch.
 - **Climb.** Ladders (the roof hatch) and climbable pipes (a drainpipe robust
   enough to reach the roof). Enter by walking into the climbable and pressing
   forward. W/S moves up and down, jump pushes you off, and you mantle

@@ -186,6 +186,26 @@ when the wish aligns with the current velocity and decel otherwise (the
 reversal skid in DESIGN §2.1). All rates are exports under
 `@export_group("Movement")`.
 
+**Input goes through `PlayerIntent`.** This is a RefCounted holding
+`wish_dir: Vector2`, `run`, `creep`, `crouch_toggled`, `jump_pressed`,
+`lean: float` (−1…1) and `look_delta: Vector2`. Each physics frame,
+`PlayerInputReader` (a Node) fills it from the Input Map. States read only
+the intent, never `Input`, so headless tests can drive the player by setting
+the intent directly and stepping physics.
+
+**Mouse look** is code-driven because it's input, not animation. Yaw rotates
+the `Player` body and pitch rotates `Camera3D.rotation.x`, clamped to ±85°.
+Look is applied immediately with no smoothing. The mouse is captured on
+click, and `ui_cancel` releases it (a developer convenience).
+
+**Mantle clearance:** the top is checked first with the standing capsule,
+then with the crouched capsule. A crouch-only fit is allowed, and the mantle
+then ends with crouch set.
+
+**Climbables:** `Climbable` (Area3D, `interactables/climbable.gd`) has
+`kind` (LADDER, PIPE) and a climb speed per kind. The climb axis is the
+Climbable's local up. func_godot's `func_climbable` maps to it in M10.
+
 **Stairs:** the player and NPCs walk on **invisible ramp colliders**
 (func_godot clip brushes). The visual steps have no collision. That's more
 robust than a step-up algorithm and matches Thief's feel.
@@ -202,8 +222,10 @@ Code only sets blend parameters:
   `LeanClearance` hit fraction before writing it.
 - `parameters/bob/blend_position` (speed 0…run), BlendSpace1D of looping bob
   cycles, with `bob_timescale` matched to step cadence. **Bob animations
-  carry method-call tracks at foot-plant frames** that call
-  `Footsteps.plant()`, so sound and motion stay in sync (DESIGN §2.1).
+  carry method-call tracks at foot-plant frames**. These call
+  `PlayerController.plant_foot()`, which emits `foot_planted(foot: int)`.
+  Footsteps (M3) listens to that signal, so sound and motion stay in sync
+  (DESIGN §2.1).
 - A `land` OneShot for the landing dip, with intensity from fall speed.
 
 ### 4.4 Input map
@@ -670,6 +692,8 @@ scripts.
 | GameState | `loot_changed(total: int)` | (end screen only) |
 | PlayerController | `visibility_changed(light: float, visibility: float)` | NPC Perception (all), DebugOverlay |
 | PlayerController | `gait_changed(gait: int)`, `crouch_changed(on: bool)` | Footsteps, RigAnimator driver |
+| PlayerController | `foot_planted(foot: int)` | Footsteps (M3) |
+| PlayerController | `landed(fall_speed: float)` | Footsteps (M3, landing noise), rig land OneShot |
 | Footsteps | → `NoiseBus.report()` (call) | — |
 | NoiseBus | `noise_emitted(event: NoiseEvent)` | NPC Perception (all), DebugOverlay |
 | LightSource | `toggled(on: bool)` | LightSampler (cache) |
