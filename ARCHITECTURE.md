@@ -31,6 +31,31 @@ changes first, then the code.
 **Recommended additional addons:** none. Everything below is built in-house
 on engine features.
 
+### 1.1 Art pipeline: photo textures and photogrammetry
+
+All visible surfaces are **real geometry with PBR materials** lit in real
+time. This is required because light is the core mechanic.
+
+- **Level surfaces** (walls, floors, doors, trim) are TrenchBroom brushes
+  textured with **photo-sourced, tileable PBR materials**: albedo, normal
+  and roughness maps made from photographs of real surfaces. func_godot maps
+  each TrenchBroom texture name to a Godot `StandardMaterial3D` or
+  `ORMMaterial3D`, and the texture name also carries the footstep surface
+  convention (§8).
+- **Props** (furniture, appliances, clutter) are **photogrammetry scans**,
+  decimated and retopologised as needed, imported as glTF, and placed in
+  maps as `prop_*` point entities or as static model entities.
+- **Capture rule.** Capture in flat, overcast light, or remove shadows
+  afterwards, so the albedo has no baked-in lighting. Baked shadows would
+  contradict the real-time lights and the power mechanic.
+- **Not used: Gaussian splatting.** Splats bake in the lighting from capture
+  time and don't respond to Godot lights, SDFGI or power changes. A splat or
+  mesh scan of the real building may be used **only as a layout reference**
+  when building maps (for example, a decimated OBJ shown on a point entity
+  in TrenchBroom to trace over). It never ships in the game.
+- Real placeholder art arrives with the developer's maps. Until then, gyms
+  and the greybox use flat prototype materials.
+
 ---
 
 ## 2. Project layout
@@ -39,6 +64,7 @@ on engine features.
 res://
 ├── addons/            gut/, func_godot/
 ├── autoload/          game_state.gd, timeline_manager.gd
+├── common/            shared framework classes (State, StateMachine)
 ├── main/              main.tscn, main.gd
 ├── player/            player.tscn, player_controller.gd, states/, rig/, inventory/
 ├── npc/               npc.tscn, npc.gd, perception/, states/, activities/
@@ -153,6 +179,16 @@ signal.
 Crouch is a **flag**, not a state. It's orthogonal to Grounded and Airborne
 and affects speed, the capsule and the rig.
 
+**State scripts** (player and NPC) are attached only to their same-named
+node under a StateMachine and are always referenced as `State`. They
+deliberately have **no `class_name`**, which keeps the global class
+namespace clear of names like `Grounded` and `Idle`. This is the one
+exception to "filename matches class".
+
+**Level authoring rule:** there is no step-up algorithm. Walkable height
+changes (stairs, thresholds, kerbs the player should walk over) must be
+invisible ramp colliders. Anything else from 0.2 m to 1.9 m is mantled.
+
 **Movement math** is a pure static helper, `MovementMath` (tested). It
 computes the new horizontal velocity given current velocity, wish direction,
 target speed, and accel/decel rates:
@@ -160,6 +196,26 @@ target speed, and accel/decel rates:
 when the wish aligns with the current velocity and decel otherwise (the
 reversal skid in DESIGN §2.1). All rates are exports under
 `@export_group("Movement")`.
+
+**Input goes through `PlayerIntent`.** This is a RefCounted holding
+`wish_dir: Vector2`, `run`, `creep`, `crouch_toggled`, `jump_pressed`,
+`lean: float` (−1…1) and `look_delta: Vector2`. Each physics frame,
+`PlayerInputReader` (a Node) fills it from the Input Map. States read only
+the intent, never `Input`, so headless tests can drive the player by setting
+the intent directly and stepping physics.
+
+**Mouse look** is code-driven because it's input, not animation. Yaw rotates
+the `Player` body and pitch rotates `Camera3D.rotation.x`, clamped to ±85°.
+Look is applied immediately with no smoothing. The mouse is captured on
+click, and `ui_cancel` releases it (a developer convenience).
+
+**Mantle clearance:** the top is checked first with the standing capsule,
+then with the crouched capsule. A crouch-only fit is allowed, and the mantle
+then ends with crouch set.
+
+**Climbables:** `Climbable` (Area3D, `interactables/climbable.gd`) has
+`kind` (LADDER, PIPE) and a climb speed per kind. The climb axis is the
+Climbable's local up. func_godot's `func_climbable` maps to it in M10.
 
 **Stairs:** the player and NPCs walk on **invisible ramp colliders**
 (func_godot clip brushes). The visual steps have no collision. That's more
@@ -177,8 +233,10 @@ Code only sets blend parameters:
   `LeanClearance` hit fraction before writing it.
 - `parameters/bob/blend_position` (speed 0…run), BlendSpace1D of looping bob
   cycles, with `bob_timescale` matched to step cadence. **Bob animations
-  carry method-call tracks at foot-plant frames** that call
-  `Footsteps.plant()`, so sound and motion stay in sync (DESIGN §2.1).
+  carry method-call tracks at foot-plant frames**. These call
+  `PlayerController.plant_foot()`, which emits `foot_planted(foot: int)`.
+  Footsteps (M3) listens to that signal, so sound and motion stay in sync
+  (DESIGN §2.1).
 - A `land` OneShot for the landing dip, with intensity from fall speed.
 
 ### 4.4 Input map
@@ -645,6 +703,8 @@ scripts.
 | GameState | `loot_changed(total: int)` | (end screen only) |
 | PlayerController | `visibility_changed(light: float, visibility: float)` | NPC Perception (all), DebugOverlay |
 | PlayerController | `gait_changed(gait: int)`, `crouch_changed(on: bool)` | Footsteps, RigAnimator driver |
+| PlayerController | `foot_planted(foot: int)` | Footsteps (M3) |
+| PlayerController | `landed(fall_speed: float)` | Footsteps (M3, landing noise), rig land OneShot |
 | Footsteps | → `NoiseBus.report()` (call) | — |
 | NoiseBus | `noise_emitted(event: NoiseEvent)` | NPC Perception (all), DebugOverlay |
 | LightSource | `toggled(on: bool)` | LightSampler (cache) |
@@ -676,7 +736,7 @@ Run with `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit`.
 | Area | Test file | What |
 |---|---|---|
 | MovementMath | `test_movement_math.gd` | Accel/decel curves, reversal skid, air control cap |
-| Player state machine | `test_player_states.gd` | Transitions with a stubbed body (floor lost → Airborne, ledge → Mantling, and so on) |
+| Player state machine | `tests/integration/test_player_*.gd` | Transitions exercised with the real `player.tscn` and real physics in small fixture scenes (floor lost → Airborne, ledge → Mantling, climb → auto-mantle, and so on). This is stronger than a stubbed body, and it's the pattern NPC tests should follow. |
 | LightMath / VisibilityMath | `test_light_math.gd` | Omni and spot attenuation match Godot's formula, exposure curve, stance and motion factors |
 | LightSampler (integration) | `test_light_sampler.gd` | A small scene with occluding walls. Switching power changes the sample. |
 | NoiseMath | `test_noise_math.gd` | Surface and gait radius, story attenuation, heard strength |

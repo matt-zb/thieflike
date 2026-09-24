@@ -1,0 +1,80 @@
+[gd_resource type="AnimationNodeBlendTree" format=3]
+
+[sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_1xfg1"]
+
+[sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_1mfch"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_du6rr"]
+animation = &"crouch_crouched"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8bxvk"]
+animation = &"crouch_stand"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_unfoc"]
+animation = &"land_dip"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_y16v4"]
+animation = &"bob_idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3nc2v"]
+animation = &"bob_cycle"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_w3ido"]
+min_space = 0.0
+max_space = 4.8
+blend_point_0/node = SubResource("AnimationNodeAnimation_y16v4")
+blend_point_0/pos = 0.0
+blend_point_0/name = &"idle"
+blend_point_1/node = SubResource("AnimationNodeAnimation_3nc2v")
+blend_point_1/pos = 4.8
+blend_point_1/name = &"cycle"
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_bd1g1"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_gbo7d"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_btfl3"]
+mix_mode = 1
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0k4co"]
+animation = &"lean_left"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_b2wa0"]
+animation = &"lean_center"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_a2pwv"]
+animation = &"lean_right"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_6npdn"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_0k4co")
+blend_point_0/pos = -1.0
+blend_point_0/name = &"left"
+blend_point_1/node = SubResource("AnimationNodeAnimation_b2wa0")
+blend_point_1/pos = 0.0
+blend_point_1/name = &"center"
+blend_point_2/node = SubResource("AnimationNodeAnimation_a2pwv")
+blend_point_2/pos = 1.0
+blend_point_2/name = &"right"
+
+[resource]
+nodes/anim_crouch_stand/node = SubResource("AnimationNodeAnimation_8bxvk")
+nodes/anim_crouch_stand/position = Vector2(-400, -200)
+nodes/anim_crouch_crouched/node = SubResource("AnimationNodeAnimation_du6rr")
+nodes/anim_crouch_crouched/position = Vector2(-400, -120)
+nodes/crouch/node = SubResource("AnimationNodeBlend2_gbo7d")
+nodes/crouch/position = Vector2(-200, -160)
+nodes/lean/node = SubResource("AnimationNodeBlendSpace1D_6npdn")
+nodes/lean/position = Vector2(-200, -60)
+nodes/bob/node = SubResource("AnimationNodeBlendSpace1D_w3ido")
+nodes/bob/position = Vector2(-400, 40)
+nodes/bob_timescale/node = SubResource("AnimationNodeTimeScale_bd1g1")
+nodes/bob_timescale/position = Vector2(-200, 40)
+nodes/add_lean/node = SubResource("AnimationNodeAdd2_1mfch")
+nodes/add_lean/position = Vector2(0, -100)
+nodes/add_bob/node = SubResource("AnimationNodeAdd2_1xfg1")
+nodes/add_bob/position = Vector2(200, -60)
+nodes/anim_land/node = SubResource("AnimationNodeAnimation_unfoc")
+nodes/anim_land/position = Vector2(200, 60)
+nodes/land/node = SubResource("AnimationNodeOneShot_btfl3")
+nodes/land/position = Vector2(400, 0)
+node_connections = [&"output", 0, &"land", &"crouch", 0, &"anim_crouch_stand", &"crouch", 1, &"anim_crouch_crouched", &"bob_timescale", 0, &"bob", &"add_lean", 0, &"crouch", &"add_lean", 1, &"lean", &"add_bob", 0, &"add_lean", &"add_bob", 1, &"bob_timescale", &"land", 0, &"add_bob", &"land", 1, &"anim_land"]
