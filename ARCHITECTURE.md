@@ -736,7 +736,7 @@ Run with `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit`.
 | Area | Test file | What |
 |---|---|---|
 | MovementMath | `test_movement_math.gd` | Accel/decel curves, reversal skid, air control cap |
-| Player state machine | `test_player_states.gd` | Transitions with a stubbed body (floor lost → Airborne, ledge → Mantling, and so on) |
+| Player state machine | `tests/integration/test_player_*.gd` | Transitions exercised with the real `player.tscn` and real physics in small fixture scenes (floor lost → Airborne, ledge → Mantling, climb → auto-mantle, and so on). This is stronger than a stubbed body, and it's the pattern NPC tests should follow. |
 | LightMath / VisibilityMath | `test_light_math.gd` | Omni and spot attenuation match Godot's formula, exposure curve, stance and motion factors |
 | LightSampler (integration) | `test_light_sampler.gd` | A small scene with occluding walls. Switching power changes the sample. |
 | NoiseMath | `test_noise_math.gd` | Surface and gait radius, story attenuation, heard strength |
