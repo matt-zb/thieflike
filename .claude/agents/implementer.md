@@ -48,3 +48,15 @@ When you finish, report:
 - Anything from the milestone's "Play" acceptance criteria the developer
   needs to check by hand.
 - Any deviations from the architecture or open questions.
+
+## Known pitfalls (found in earlier milestones)
+
+- `AnimationNodeOneShot` defaults to blend (replace) mix mode. It resets
+  every track it doesn't define for its whole duration. Use
+  `MIX_MODE_ADD` for additive one-shots.
+- GUT's `wait_physics_frames(n)` spans n+1 physics ticks. For one-shot
+  intent flags (toggles, presses), `await get_tree().physics_frame` instead.
+- GDScript lambdas capture value-type locals by value. To record anything
+  from a signal callback in a test, use a one-element Array or a Dictionary.
+- Measure ledge and step heights from a ground raycast, not from the
+  body's current Y (a mid-jump Y gives wrong results).

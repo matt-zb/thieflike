@@ -64,6 +64,7 @@ time. This is required because light is the core mechanic.
 res://
 ├── addons/            gut/, func_godot/
 ├── autoload/          game_state.gd, timeline_manager.gd
+├── common/            shared framework classes (State, StateMachine)
 ├── main/              main.tscn, main.gd
 ├── player/            player.tscn, player_controller.gd, states/, rig/, inventory/
 ├── npc/               npc.tscn, npc.gd, perception/, states/, activities/
@@ -177,6 +178,16 @@ signal.
 
 Crouch is a **flag**, not a state. It's orthogonal to Grounded and Airborne
 and affects speed, the capsule and the rig.
+
+**State scripts** (player and NPC) are attached only to their same-named
+node under a StateMachine and are always referenced as `State`. They
+deliberately have **no `class_name`**, which keeps the global class
+namespace clear of names like `Grounded` and `Idle`. This is the one
+exception to "filename matches class".
+
+**Level authoring rule:** there is no step-up algorithm. Walkable height
+changes (stairs, thresholds, kerbs the player should walk over) must be
+invisible ramp colliders. Anything else from 0.2 m to 1.9 m is mantled.
 
 **Movement math** is a pure static helper, `MovementMath` (tested). It
 computes the new horizontal velocity given current velocity, wish direction,

@@ -38,6 +38,8 @@ to the player's head. The *body* carries the weight.
 | Crouch  | C (toggle)       | ×0.55 of gait      | same               | same               | ×0.5  |
 
 All values are starting points and live in exported variables.
+If creep and run are both held, creep wins. When in doubt, the game picks
+the quiet option.
 
 - **Momentum.** Deceleration is shorter than acceleration, so stopping feels
   deliberate but not slippery. Hard direction reversals at run speed carry
@@ -52,9 +54,12 @@ All values are starting points and live in exported variables.
   up to 0.45 m sideways and 12° of roll. Lean stops at walls so the camera
   never clips. The body does not move, so leaning around a doorframe exposes
   the head only (visibility is sampled at the head while leaning, §2.2).
-- **Mantle.** Press jump facing a ledge between 0.5 m and 1.9 m above your
-  feet with enough clearance on top. The player climbs over the ledge in about
-  0.6–0.9 s, taking longer for higher ledges. Input is locked during the
+- **Mantle.** Press jump facing a ledge between 0.2 m and 1.9 m above your
+  feet with enough clearance on top. Ledges from 0.5 m up take about
+  0.6–0.9 s, longer for higher ones. Low ledges (0.2–0.5 m: kerbs, a raised
+  threshold, a low table) are a quick step-up of about 0.3 s. There is no
+  automatic step-up while walking. Anything the player should walk over
+  without jumping, like stairs, must be a ramp collider (ARCHITECTURE §4.2). Input is locked during the
   mantle and the climb makes a soft noise. Used for window sills, fences, the
   alley wall and furniture. If there's only crouch-height clearance on top
   (a window opening, for example), the mantle ends in a crouch.
