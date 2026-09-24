@@ -44,6 +44,7 @@ func test_main_scene_instantiates_with_expected_node_paths() -> void:
 	assert_true(main.get_node("World") is Node3D, "World should be Node3D")
 	assert_true(main.get_node("World/NavigationRegion3D") is NavigationRegion3D, "NavigationRegion3D should be that type")
 	assert_true(main.get_node("UI") is CanvasLayer, "UI should be a CanvasLayer")
+	assert_true(main.get_node("Player") is PlayerController, "Player should be a PlayerController")
 
 
 func test_rendering_method_is_forward_plus() -> void:

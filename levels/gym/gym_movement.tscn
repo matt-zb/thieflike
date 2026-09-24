@@ -1,0 +1,424 @@
+[gd_scene load_steps=40 format=3]
+
+[ext_resource type="Script" path="res://interactables/climbable.gd" id="11"]
+
+[sub_resource type="Environment" id="Environment_gym"]
+background_mode = 1
+background_color = Color(0.03, 0.03, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.55, 0.65, 1)
+ambient_light_energy = 0.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.65, 0.63, 0.6, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ledge"]
+albedo_color = Color(0.4, 0.45, 0.55, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_window"]
+albedo_color = Color(0.5, 0.35, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_crawl"]
+albedo_color = Color(0.35, 0.4, 0.35, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stair"]
+albedo_color = Color(0.5, 0.48, 0.42, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
+albedo_color = Color(0.42, 0.3, 0.25, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_PatchCarpet"]
+albedo_color = Color(0.55, 0.15, 0.15, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_PatchWood"]
+albedo_color = Color(0.5, 0.35, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_PatchTile"]
+albedo_color = Color(0.75, 0.75, 0.8, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_PatchConcrete"]
+albedo_color = Color(0.6, 0.6, 0.6, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_PatchGravel"]
+albedo_color = Color(0.45, 0.42, 0.38, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ladder"]
+size = Vector3(0.8, 3.2, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pipe"]
+size = Vector3(0.5, 3.6, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.55, 0.55, 0.58, 1)
+metallic = 0.6
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_ladder"]
+size = Vector3(0.7, 3.2, 0.08)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pipe"]
+top_radius = 0.09
+bottom_radius = 0.09
+height = 3.6
+
+[node name="World" type="Node3D"]
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="DirectionalLight" type="DirectionalLight3D" parent="Lights"]
+transform = Transform3D(0.8, -0.35, 0.48, 0, 0.8, 0.6, -0.6, -0.48, 0.64, 0, 8, 0)
+light_energy = 1.1
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Lights"]
+environment = SubResource("Environment_gym")
+
+[node name="NPCs" type="Node3D" parent="."]
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Systems" type="Node" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 5)
+visible = true
+use_collision = true
+size = Vector3(44, 0.2, 24)
+material = SubResource("StandardMaterial3D_floor")
+[node name="BoundaryNorth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -6)
+visible = true
+use_collision = true
+size = Vector3(44, 4, 0.3)
+material = SubResource("StandardMaterial3D_wall")
+[node name="BoundarySouth" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 17)
+visible = true
+use_collision = true
+size = Vector3(44, 4, 0.3)
+material = SubResource("StandardMaterial3D_wall")
+[node name="BoundaryWest" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2, 5)
+visible = true
+use_collision = true
+size = Vector3(0.3, 4, 24)
+material = SubResource("StandardMaterial3D_wall")
+[node name="BoundaryEast" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2, 5)
+visible = true
+use_collision = true
+size = Vector3(0.3, 4, 24)
+material = SubResource("StandardMaterial3D_wall")
+[node name="Ledge_0_4" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.2, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 0.4, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_0_4_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.8, 0)
+text = "0.4 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_0_25" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.125, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 0.25, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_0_25_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.55, 0)
+text = "0.25 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_0_5" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.25, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 0.5, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_0_5_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.9, 0)
+text = "0.5 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_1_0" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.5, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 1.0, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_1_0_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.4, 0)
+text = "1.0 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_1_5" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.75, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 1.5, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_1_5_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.9, 0)
+text = "1.5 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_1_9" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.95, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 1.9, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_1_9_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.3, 0)
+text = "1.9 m"
+font_size = 48
+outline_size = 8
+[node name="Ledge_2_0" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.0, 0)
+visible = true
+use_collision = true
+size = Vector3(1.6, 2.0, 1.2)
+material = SubResource("StandardMaterial3D_ledge")
+[node name="Ledge_2_0_Label" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.4, 0)
+text = "2.0 m"
+font_size = 48
+outline_size = 8
+[node name="WindowSill" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.45, 6)
+visible = true
+use_collision = true
+size = Vector3(2.2, 0.9, 0.4)
+material = SubResource("StandardMaterial3D_window")
+[node name="WindowLintel" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 2.7249999999999996, 6)
+visible = true
+use_collision = true
+size = Vector3(2.2, 1.35, 0.4)
+material = SubResource("StandardMaterial3D_window")
+[node name="WindowLabel" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 3.6, 6)
+text = "window: 0.9 m sill, 1.15 m gap"
+font_size = 48
+outline_size = 8
+[node name="CrawlFloorEdge" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0.0, 11)
+visible = true
+use_collision = false
+size = Vector3(2.2, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_crawl")
+[node name="CrawlLeftWall" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.2, 0.9, 11)
+visible = true
+use_collision = true
+size = Vector3(0.3, 1.8, 3.0)
+material = SubResource("StandardMaterial3D_crawl")
+[node name="CrawlRightWall" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.8, 0.9, 11)
+visible = true
+use_collision = true
+size = Vector3(0.3, 1.8, 3.0)
+material = SubResource("StandardMaterial3D_crawl")
+[node name="CrawlCeiling" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.3, 11)
+visible = true
+use_collision = true
+size = Vector3(2.4, 0.1, 3.0)
+material = SubResource("StandardMaterial3D_crawl")
+[node name="CrawlLabel" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.7, 9)
+text = "crawlspace: 1.3 m"
+font_size = 48
+outline_size = 8
+[node name="StairRampCollider" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 0.894427, 0.447214, 0, -0.447214, 0.894427, 4, 1.0, 10.0)
+visible = false
+use_collision = true
+size = Vector3(2.4, 0.2, 4.4721)
+[node name="Step_0" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.125, 8.25)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_1" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.375, 8.75)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_2" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.625, 9.25)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_3" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.875, 9.75)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_4" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.125, 10.25)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_5" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.375, 10.75)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_6" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.625, 11.25)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="Step_7" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.875, 11.75)
+visible = true
+use_collision = false
+size = Vector3(2.4, 0.05, 0.55)
+material = SubResource("StandardMaterial3D_stair")
+[node name="StairLabel" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.4, 12.0)
+text = "stairs: invisible ramp"
+font_size = 48
+outline_size = 8
+[node name="StairPlatform" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.0, 13.0)
+visible = true
+use_collision = true
+size = Vector3(2.6, 0.2, 1.6)
+material = SubResource("StandardMaterial3D_stair")
+[node name="DoorWallLeft" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.35, 1.2, -3)
+visible = true
+use_collision = true
+size = Vector3(1.3, 2.4, 0.3)
+material = SubResource("StandardMaterial3D_door")
+[node name="DoorWallRight" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.65, 1.2, -3)
+visible = true
+use_collision = true
+size = Vector3(1.3, 2.4, 0.3)
+material = SubResource("StandardMaterial3D_door")
+[node name="DoorLintel" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.6, -3)
+visible = true
+use_collision = true
+size = Vector3(5.3, 0.4, 0.3)
+material = SubResource("StandardMaterial3D_door")
+[node name="DoorLabel" type="Label3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.0, -3)
+text = "lean here"
+font_size = 48
+outline_size = 8
+[node name="PatchCarpet" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.02, 4)
+visible = true
+use_collision = false
+size = Vector3(4.0, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_PatchCarpet")
+[node name="PatchWood" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.02, 4)
+visible = true
+use_collision = false
+size = Vector3(4.0, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_PatchWood")
+[node name="PatchTile" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.02, 4)
+visible = true
+use_collision = false
+size = Vector3(4.0, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_PatchTile")
+[node name="PatchConcrete" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.02, 4)
+visible = true
+use_collision = false
+size = Vector3(4.0, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_PatchConcrete")
+[node name="PatchGravel" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0.02, 4)
+visible = true
+use_collision = false
+size = Vector3(4.0, 0.05, 3.0)
+material = SubResource("StandardMaterial3D_PatchGravel")
+
+[node name="LadderPlatform" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 3.2, 4.5)
+visible = true
+use_collision = true
+size = Vector3(2.2, 0.2, 2.0)
+material = SubResource("StandardMaterial3D_stair")
+
+[node name="Ladder" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.6, 6)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11")
+kind = 0
+top_marker_path = NodePath("TopMarker")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/Ladder"]
+shape = SubResource("BoxShape3D_ladder")
+
+[node name="LadderMesh" type="MeshInstance3D" parent="Interactables/Ladder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.15)
+mesh = SubResource("BoxMesh_ladder")
+material_override = SubResource("StandardMaterial3D_metal")
+
+[node name="TopMarker" type="Marker3D" parent="Interactables/Ladder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -1.0)
+
+[node name="LadderLabel" type="Label3D" parent="Interactables/Ladder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+text = "ladder"
+font_size = 48
+outline_size = 8
+
+[node name="PipePlatform" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 3.6, 4.5)
+visible = true
+use_collision = true
+size = Vector3(2.0, 0.2, 2.0)
+material = SubResource("StandardMaterial3D_stair")
+
+[node name="Pipe" type="Area3D" parent="Interactables"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 1.8, 6)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11")
+kind = 1
+top_marker_path = NodePath("TopMarker")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactables/Pipe"]
+shape = SubResource("BoxShape3D_pipe")
+
+[node name="PipeMesh" type="MeshInstance3D" parent="Interactables/Pipe"]
+mesh = SubResource("CylinderMesh_pipe")
+material_override = SubResource("StandardMaterial3D_metal")
+
+[node name="TopMarker" type="Marker3D" parent="Interactables/Pipe"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, -1.0)
+
+[node name="PipeLabel" type="Label3D" parent="Interactables/Pipe"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+text = "pipe (slower)"
+font_size = 48
+outline_size = 8
+
+[node name="PlayerStart" type="Marker3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, -3)
